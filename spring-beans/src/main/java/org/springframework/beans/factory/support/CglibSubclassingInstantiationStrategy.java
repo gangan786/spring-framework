@@ -114,6 +114,7 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 		 * @return new instance of the dynamically generated subclass
 		 */
 		public Object instantiate(@Nullable Constructor<?> ctor, Object... args) {
+			//获取增强子类，处理lookup-method、replace-method
 			Class<?> subclass = createEnhancedSubclass(this.beanDefinition);
 			Object instance;
 			if (ctor == null) {
@@ -121,6 +122,7 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 			}
 			else {
 				try {
+					// 通过参数ctor，获得增强子类对应的构造函数，并实例化
 					Constructor<?> enhancedSubclassConstructor = subclass.getConstructor(ctor.getParameterTypes());
 					instance = enhancedSubclassConstructor.newInstance(args);
 				}
@@ -161,6 +163,7 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 	 * Class providing hashCode and equals methods required by CGLIB to
 	 * ensure that CGLIB doesn't generate a distinct class per bean.
 	 * Identity is based on class and bean definition.
+	 * CGLIB 提供 #hashCode() 和 #equals(Object o) 方法，以确保 CGLIB 不会为每个 Bean 生成不同的类
 	 */
 	private static class CglibIdentitySupport {
 

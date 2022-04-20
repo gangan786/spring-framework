@@ -36,3 +36,7 @@ Follow [@SpringCentral](https://twitter.com/springcentral), [@SpringFramework](h
 ## License
 
 The Spring Framework is released under version 2.0 of the [Apache License](https://www.apache.org/licenses/LICENSE-2.0).
+
+## 学习指南
+bean加载复习总结 -->
+[【死磕 Spring】—— IoC 之加载 Bean：总结](http://svip.iocoder.cn/Spring/IoC-get-Bean-summary/)

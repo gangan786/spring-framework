@@ -1,5 +1,6 @@
 package example.gangan;
 
+import example.gangan.Bo.MyDisplay;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.ClassPathResource;
@@ -33,5 +34,15 @@ public class Test {
 		xmlBeanDefinitionReader.loadBeanDefinitions(classPathResource);
 		Object stuPopulateBean = defaultListableBeanFactory.getBean("stuForPopulateBean");
 		System.out.println(stuPopulateBean);
+	}
+
+	@org.junit.Test
+	public void testInstantiationStrategy() {
+		ClassPathResource classPathResource = new ClassPathResource("example/gangan/instantiationStrategyTest.xml");
+		DefaultListableBeanFactory defaultListableBeanFactory = new DefaultListableBeanFactory();
+		XmlBeanDefinitionReader xmlBeanDefinitionReader = new XmlBeanDefinitionReader(defaultListableBeanFactory);
+		xmlBeanDefinitionReader.loadBeanDefinitions(classPathResource);
+		MyDisplay myDisplay = (MyDisplay) defaultListableBeanFactory.getBean("myDisplay");
+		myDisplay.display();
 	}
 }
