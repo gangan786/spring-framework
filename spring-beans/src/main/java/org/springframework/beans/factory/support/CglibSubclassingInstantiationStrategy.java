@@ -237,6 +237,12 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 
 		@Override
 		public Object intercept(Object obj, Method method, Object[] args, MethodProxy mp) throws Throwable {
+			/**
+			 * 拦截lookup-method，将该方法的返回值改为定义的hongqi
+			 * <bean id="display" class="org.springframework.core.test1.Display">
+			 *     <lookup-method name="getCar" bean="hongqi"/>
+			 * </bean>
+			 */
 			// Cast is safe, as CallbackFilter filters are used selectively.
 			LookupOverride lo = (LookupOverride) getBeanDefinition().getMethodOverrides().getOverride(method);
 			Assert.state(lo != null, "LookupOverride not found");
@@ -272,6 +278,13 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 
 		@Override
 		public Object intercept(Object obj, Method method, Object[] args, MethodProxy mp) throws Throwable {
+			/**
+			 * 拦截replaced-method中的原始方法
+			 * </bean id="method" class="org.springframework.core.test1.Method">
+			 *     <replaced-method name="被拦截的原始方法名" replacer="拦截逻辑的实现：MethodReplacer的beanName"/>
+			 * </bean>
+			 */
+
 			ReplaceOverride ro = (ReplaceOverride) getBeanDefinition().getMethodOverrides().getOverride(method);
 			Assert.state(ro != null, "ReplaceOverride not found");
 			// TODO could cache if a singleton for minor performance optimization

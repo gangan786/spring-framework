@@ -43,6 +43,7 @@ public class Test {
 		XmlBeanDefinitionReader xmlBeanDefinitionReader = new XmlBeanDefinitionReader(defaultListableBeanFactory);
 		xmlBeanDefinitionReader.loadBeanDefinitions(classPathResource);
 		MyDisplay myDisplay = (MyDisplay) defaultListableBeanFactory.getBean("myDisplay");
+		// 这里返回的MyDisplay实例是他的代理类的实例
 		myDisplay.display();
 	}
 }
