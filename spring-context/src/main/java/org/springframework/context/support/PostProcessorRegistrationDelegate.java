@@ -76,6 +76,11 @@ final class PostProcessorRegistrationDelegate {
 		Set<String> processedBeans = new HashSet<>();
 
 		if (beanFactory instanceof BeanDefinitionRegistry) {
+			/**
+			 *  先执行有顺序的 BeanDefinitionRegistryPostProcessor：
+			 *  然后执行所有已注册的 BeanFactoryPostProcessor
+			 */
+
 			BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
 			List<BeanFactoryPostProcessor> regularPostProcessors = new ArrayList<>();
 			List<BeanDefinitionRegistryPostProcessor> registryProcessors = new ArrayList<>();
@@ -103,6 +108,7 @@ final class PostProcessorRegistrationDelegate {
 					beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
 			for (String ppName : postProcessorNames) {
 				if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
+					// 首先处理实现了 PriorityOrdered (有限排序接口)的 BeanDefinitionRegistryPostProcessor
 					currentRegistryProcessors.add(beanFactory.getBean(ppName, BeanDefinitionRegistryPostProcessor.class));
 					processedBeans.add(ppName);
 				}
@@ -116,6 +122,7 @@ final class PostProcessorRegistrationDelegate {
 			postProcessorNames = beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
 			for (String ppName : postProcessorNames) {
 				if (!processedBeans.contains(ppName) && beanFactory.isTypeMatch(ppName, Ordered.class)) {
+					// 处理 Ordered（普通排序接口）的 BeanDefinitionRegistryPostProcessors
 					currentRegistryProcessors.add(beanFactory.getBean(ppName, BeanDefinitionRegistryPostProcessor.class));
 					processedBeans.add(ppName);
 				}
@@ -144,6 +151,13 @@ final class PostProcessorRegistrationDelegate {
 			}
 
 			// Now, invoke the postProcessBeanFactory callback of all processors handled so far.
+			/**
+			 * 由于registryProcessors都是按照以下顺序，往后添加的
+			 * PriorityOrdered 、Ordered 和 no Ordered
+			 * 所以即使在这边一股脑的执行所有的 BeanFactoryPostProcessor.postProcessBeanFactory 方法
+			 * 也是按照PriorityOrdered 、Ordered里面定义的顺序依次执行
+			 * 即顺序定义是对两个接口：postProcessBeanFactory、postProcessBeanDefinitionRegistry同时生效的
+			 */
 			invokeBeanFactoryPostProcessors(registryProcessors, beanFactory);
 			invokeBeanFactoryPostProcessors(regularPostProcessors, beanFactory);
 		}
@@ -152,7 +166,17 @@ final class PostProcessorRegistrationDelegate {
 			// Invoke factory processors registered with the context instance.
 			invokeBeanFactoryPostProcessors(beanFactoryPostProcessors, beanFactory);
 		}
+		/**
+		 * 至此已经执行完成了注册的
+		 * BeanDefinitionRegistryPostProcessor接口的两个回调：
+		 * 	postProcessBeanFactory
+		 * 	postProcessBeanDefinitionRegistry
+		 */
 
+		/**
+		 * 下面开始对注册的BeanFactoryPostProcessor接口的进行回调
+		 * 同样实现顺序调用  PriorityOrdered 、Ordered 和 no Ordered
+		 */
 		// Do not initialize FactoryBeans here: We need to leave all regular beans
 		// uninitialized to let the bean factory post-processors apply to them!
 		String[] postProcessorNames =
